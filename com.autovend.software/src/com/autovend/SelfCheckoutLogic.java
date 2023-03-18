@@ -13,18 +13,17 @@ public class SelfCheckoutLogic {
 	public SelfCheckoutStation selfCheckoutStation;
 	public ElectronicScale baggingArea;
 	public AddItemController addItemController;
-	public PrintReceipt printReceipt;
+	public PrintReceiptController printReceiptController;
+	public PrintReceiptController printReceipt;
 	public ArrayList<BarcodedProduct> scannedItems = new ArrayList<>();
 	public BigDecimal totalCost = BigDecimal.valueOf(0.00);
 	public double baggingAreaExpectedWeight = 0;
 	public double baggingAreaWeight;
 	
-	public SelfCheckoutLogic(SelfCheckoutStation station){
-		selfCheckoutStation = station;
-		baggingArea = station.baggingArea;
+	public SelfCheckoutLogic(SelfCheckoutStation scs){
+		selfCheckoutStation = scs;
+		baggingArea = scs.baggingArea;
 		addItemController = new AddItemController(selfCheckoutStation, this);
-		printReceipt = new PrintReceipt(this);
-		
-		
+		printReceiptController = new PrintReceiptController(selfCheckoutStation, this);
 	}
 }

@@ -9,6 +9,8 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.autovend.devices.EmptyException;
+import com.autovend.devices.OverloadException;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.external.ProductDatabases;
 import com.autovend.products.BarcodedProduct;
@@ -22,7 +24,7 @@ public class AddItemTest {
 	
 	
 	@Before
-	public void generalSetup() {
+	public void generalSetup() throws OverloadException {
 		currency = Currency.getInstance(Locale.CANADA);
 		scs = new SelfCheckoutStation(currency, new int[] {5,10}, new BigDecimal[] {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10)}, 100, 1);
 		scl = new SelfCheckoutLogic(scs);
@@ -34,6 +36,8 @@ public class AddItemTest {
 		BarcodedProduct bp2 = new BarcodedProduct(barcode2, "orange", BigDecimal.valueOf(1.50), 150);
 		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode1, bp1);
 		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode2, bp2);
+		scs.printer.addInk(100);
+		scs.printer.addPaper(20);
 	}
 
 	@Test
@@ -42,5 +46,15 @@ public class AddItemTest {
 		scs.mainScanner.scan(item);
 		System.out.println(scl.totalCost);
 		assertEquals(BigDecimal.valueOf(2.00), scl.totalCost);
+	}
+	
+	@Test
+	public void test2() throws OverloadException, EmptyException {
+		BarcodedUnit item = new BarcodedUnit(barcode1, 100);
+		scs.mainScanner.scan(item);
+		String receipt = scl.printReceiptController.printReceipt();
+		System.out.println(receipt);
+		String expected = "ITEMS:\napple: 2.00\nTOTAL: 2.00";
+		assertEquals(expected, receipt);
 	}
 }

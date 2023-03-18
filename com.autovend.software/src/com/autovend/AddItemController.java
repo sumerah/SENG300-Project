@@ -54,9 +54,6 @@ public class AddItemController implements BarcodeScannerObserver, ElectronicScal
 		BigDecimal price = item.getPrice();
 		double weight = item.getExpectedWeight();
 		
-		//Update list of scannedItems
-		selfCheckoutLogic.scannedItems.add(item);
-		
 		//Update expectedWeight for the baggingArea
 		selfCheckoutLogic.baggingAreaExpectedWeight += weight;
 		
