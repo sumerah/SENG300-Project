@@ -61,6 +61,7 @@ public class PrintReceiptController implements ReceiptPrinterObserver {
 			bdPrice = bdPrice.setScale(2, RoundingMode.HALF_UP);
 			String sPrice = bdPrice.toString();
 			
+			printer.print('$');
 			//Print item price to receipt
 			for (int i = 0; i < sPrice.length(); i++) {
 				printer.print(sPrice.charAt(i));
@@ -70,6 +71,7 @@ public class PrintReceiptController implements ReceiptPrinterObserver {
 		
 		//Print "TOTAL:" for total cost of items
 		printer.print('T'); printer.print('O'); printer.print('T'); printer.print('A'); printer.print('L'); printer.print(':'); printer.print(' ');
+		printer.print('$');
 		
 		//Get total cost of items and convert to string
 		BigDecimal bdTotalCost = selfCheckoutLogic.totalCost;
