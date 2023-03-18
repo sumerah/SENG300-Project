@@ -1,12 +1,3 @@
-//SENG300 Project
-//Group 47
-//Student Names:
-//Sumerah Rowshan (UCID: 30160897)
-//Justin Chu (UCID: 30162809)
-//Jitaksha Batish (UCID: 30116450)
-//Fairooz Shafin (UCID: 30149774)
-//AAL Farhan Ali (UCID: 30148704)
-
 package com.autovend;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -17,18 +8,44 @@ import com.autovend.devices.observers.AbstractDeviceObserver;
 import com.autovend.devices.observers.BarcodeScannerObserver;
 import com.autovend.devices.observers.ElectronicScaleObserver;
 
+/**
+ * Controls the logic when items are added to the baggingArea
+ * @author Justin Chu, 30162809
+ * @author Jitaksha Batish, 30116450
+ * @author Sumerah Rowshan, 30160897
+ * @author Fairooz Shafin, 30149774
+ * @author AAL Farhan Ali, 30148704
+ */
 public class AddItemController implements BarcodeScannerObserver, ElectronicScaleObserver{
 	private SelfCheckoutStation selfCheckoutStation;
 	public SelfCheckoutLogic selfCheckoutLogic;
 	
+	/**
+	 * Basic Constructor
+	 * 
+	 * @param scs
+	 * 				The self-checkout station
+	 * @param scl
+	 * 				The self-checkout logic
+	 */
 	public AddItemController (SelfCheckoutStation scs, SelfCheckoutLogic scl) {
 		selfCheckoutStation = scs;
 		selfCheckoutLogic = scl;
 		
+		//register the station's scanners and listen to events
 		selfCheckoutStation.mainScanner.register(this);
 		selfCheckoutStation.handheldScanner.register(this);
 	}
 
+	/**
+	 * Reaction for when a product is scanned
+	 * 1. Blocks the station from further customer interaction
+	 * 2. Determine the expected weight and price of the product (retrieve from BARCODED_PRODUCT_DATABASE)
+	 * 3. Update expected weight of the baggingArea
+	 * 4. Notifies the customer to place the product in the baggingArea
+	 * 5. Hardware signifies to the system that the weight has changed
+	 * 6. Unblocks the station for further scanning
+	 */
 	@Override
 	public void reactToBarcodeScannedEvent(BarcodeScanner barcodeScanner, Barcode barcode) {
 		//Only run if station is enabled
