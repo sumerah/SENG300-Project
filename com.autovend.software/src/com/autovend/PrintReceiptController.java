@@ -29,6 +29,11 @@ public class PrintReceiptController implements ReceiptPrinterObserver {
 	}
 	
 	public String printReceipt() throws OverloadException, EmptyException {
+		//Only run if station is enabled
+		if (selfCheckoutLogic.systemDisabled) {
+			throw new DisabledException();
+		}
+		
 		//Print "ITEMS:" title to receipt
 		printer.print('I'); printer.print('T'); printer.print('E'); printer.print('M'); printer.print('S'); printer.print(':'); printer.print('\n');
 		//For every item in the baggingArea
@@ -68,13 +73,49 @@ public class PrintReceiptController implements ReceiptPrinterObserver {
 			printer.print(sTotalCost.charAt(i));
 		}
 		
+		//Cut (end) receipt
 		printer.cutPaper();
 		String printedReceipt = printer.removeReceipt();
 		
+		//Notify customer
+		selfCheckoutLogic.customer.notifySessionDone();
+		selfCheckoutLogic.customer.thankCustomer();
+		selfCheckoutLogic.customer.readyForNewCustomer();
+		
 		return printedReceipt;
 	}
-	
 
+	@Override
+	public void reactToOutOfPaperEvent(ReceiptPrinter printer) {
+		//Notify attendant
+		selfCheckoutLogic.attendant.notifyStationNeedsMaintenance();
+		selfCheckoutLogic.attendant.notifyDuplicateReceipt();
+		//Disable station
+		selfCheckoutLogic.disable();
+	}
+
+	@Override
+	public void reactToOutOfInkEvent(ReceiptPrinter printer) {
+		//Notify attendant
+		selfCheckoutLogic.attendant.notifyStationNeedsMaintenance();
+		selfCheckoutLogic.attendant.notifyDuplicateReceipt();
+		//Disable station
+		selfCheckoutLogic.disable();
+		
+	}
+
+	@Override
+	public void reactToPaperAddedEvent(ReceiptPrinter printer) {
+		selfCheckoutLogic.enable();
+		
+	}
+
+	@Override
+	public void reactToInkAddedEvent(ReceiptPrinter printer) {
+		selfCheckoutLogic.enable();
+		
+	}
+	
 	@Override
 	public void reactToEnabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
 		// TODO Auto-generated method stub
@@ -83,30 +124,6 @@ public class PrintReceiptController implements ReceiptPrinterObserver {
 
 	@Override
 	public void reactToDisabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void reactToOutOfPaperEvent(ReceiptPrinter printer) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void reactToOutOfInkEvent(ReceiptPrinter printer) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void reactToPaperAddedEvent(ReceiptPrinter printer) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void reactToInkAddedEvent(ReceiptPrinter printer) {
 		// TODO Auto-generated method stub
 		
 	}

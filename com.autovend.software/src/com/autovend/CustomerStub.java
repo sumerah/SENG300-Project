@@ -1,5 +1,33 @@
 package com.autovend;
 
-public interface CustomerStub {
+import java.math.BigDecimal;
+
+public class CustomerStub {
+	public int placeItemInBaggingArea = 0;
+	public int sessionDone = 0;
+	public int thankCustomer = 0;
+	public int readyForNewCustomer = 0;
+	public BigDecimal amountDue;
+
+
+	public void notifyPlaceItemInBaggingArea() {
+		placeItemInBaggingArea += 1;
+	}
 	
+	public void notifySessionDone() {
+		sessionDone += 0;
+	}
+	
+	public void thankCustomer() {
+		thankCustomer += 0;
+	}
+	
+	public void readyForNewCustomer() {
+		readyForNewCustomer += 1;
+	}
+	
+	public void notifyAmountDue(BigDecimal amount) {
+		amountDue = amount;
+	}
 }
+

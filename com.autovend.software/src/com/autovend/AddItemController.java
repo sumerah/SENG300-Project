@@ -1,8 +1,6 @@
 package com.autovend;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-
-import com.autovend.*;
+import java.math.RoundingMode;
 import com.autovend.external.ProductDatabases;
 import com.autovend.products.BarcodedProduct;
 import com.autovend.devices.*;
@@ -21,37 +19,21 @@ public class AddItemController implements BarcodeScannerObserver, ElectronicScal
 		selfCheckoutStation.mainScanner.register(this);
 		selfCheckoutStation.handheldScanner.register(this);
 	}
-	
-	public void blockSystem() {
-		selfCheckoutStation.mainScanner.disable();
-		selfCheckoutStation.handheldScanner.disable();
-	}
-	
-	public void unblockSystem() {
-		selfCheckoutStation.mainScanner.enable();
-		selfCheckoutStation.handheldScanner.enable();
-	}
-
-	@Override
-	public void reactToEnabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void reactToDisabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void reactToBarcodeScannedEvent(BarcodeScanner barcodeScanner, Barcode barcode) {
+		//Only run if station is enabled
+		if (selfCheckoutLogic.systemDisabled) {
+			throw new DisabledException();
+		}
+		
 		//Block selfCheckoutStation from further scanning/interaction
-		blockSystem();
+		selfCheckoutLogic.disable();
 		
 		//Grab weight and cost of the product associated with the barcode
 		BarcodedProduct item = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
 		BigDecimal price = item.getPrice();
+		price = price.setScale(2, RoundingMode.HALF_UP);
 		double weight = item.getExpectedWeight();
 		
 		//Update expectedWeight for the baggingArea
@@ -65,14 +47,28 @@ public class AddItemController implements BarcodeScannerObserver, ElectronicScal
 		selfCheckoutLogic.scannedItems.add(item);
 		BigDecimal result = selfCheckoutLogic.totalCost.add(price);
 		selfCheckoutLogic.totalCost = result;
+		selfCheckoutLogic.amountDue = result;
 
-		//TODO signify to Customer I/O to place scanned item in the bagging area
+		//Signify to Customer I/O to place scanned item in the bagging area
+		selfCheckoutLogic.customer.notifyPlaceItemInBaggingArea();
 		
 		//Unblock the station
-		unblockSystem();
+		selfCheckoutLogic.enable();
+	}
+	
+	
+
+	@Override
+	public void reactToEnabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
+		// TODO Auto-generated method stub
 		
 	}
 
+	@Override
+	public void reactToDisabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	@Override
 	public void reactToWeightChangedEvent(ElectronicScale scale, double weightInGrams) {
