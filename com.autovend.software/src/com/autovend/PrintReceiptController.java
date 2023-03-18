@@ -46,7 +46,6 @@ public class PrintReceiptController implements ReceiptPrinterObserver {
 				printer.print(description.charAt(i));
 			}
 			printer.print(':'); printer.print(' ');
-			System.out.println(printer.sb);
 			
 			//Get item price and convert to string
 			BigDecimal bdPrice = item.getPrice();

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.lang.Math;
 
 import com.autovend.devices.ElectronicScale;
+import com.autovend.devices.EmptyException;
 import com.autovend.devices.OverloadException;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.products.*;
@@ -31,7 +32,7 @@ public class SelfCheckoutLogic {
 		addItemController = new AddItemController(selfCheckoutStation, this);
 		printReceiptController = new PrintReceiptController(selfCheckoutStation, this);
 		payController = new PayController(selfCheckoutStation, this);
-	}
+	}	
 	
 	public void enable() {systemDisabled = false;}
 	

@@ -1,4 +1,4 @@
-package com.autovend;
+package com.autovend.software.test;
 
 import static org.junit.Assert.*;
 
@@ -9,13 +9,17 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.autovend.Barcode;
+import com.autovend.BarcodedUnit;
+import com.autovend.Numeral;
+import com.autovend.SelfCheckoutLogic;
 import com.autovend.devices.EmptyException;
 import com.autovend.devices.OverloadException;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.external.ProductDatabases;
 import com.autovend.products.BarcodedProduct;
 
-public class AddItemTest {
+public class Tests {
 	private SelfCheckoutStation scs;
 	private Currency currency;
 	private SelfCheckoutLogic scl;

@@ -15,7 +15,7 @@ public class ReceiptPrinter extends AbstractDevice<ReceiptPrinterObserver> {
 	private static final long serialVersionUID = 2485932101191989634L;
 	private int charactersOfInkRemaining = 0;
 	private int linesOfPaperRemaining = 0;
-	public StringBuilder sb = new StringBuilder();
+	private StringBuilder sb = new StringBuilder();
 	private int charactersOnCurrentLine = 0;
 
 	/**
