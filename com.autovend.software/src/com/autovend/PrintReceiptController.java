@@ -1,12 +1,3 @@
-//SENG300 Project
-//Group 47
-//Student Names:
-//Sumerah Rowshan (UCID: 30160897)
-//Justin Chu (UCID: 30162809)
-//Jitaksha Batish (UCID: 30116450)
-//Fairooz Shafin (UCID: 30149774)
-//AAL Farhan Ali (UCID: 30148704)
-
 
 package com.autovend;
 
@@ -20,23 +11,58 @@ import com.autovend.devices.observers.AbstractDeviceObserver;
 import com.autovend.devices.observers.ReceiptPrinterObserver;
 import com.autovend.products.BarcodedProduct;
 
-
-
+/**
+ * Controls the logic when for receipt related things
+ * @author Justin Chu, 30162809
+ * @author Jitaksha Batish, 30116450
+ * @author Sumerah Rowshan, 30160897
+ * @author Fairooz Shafin, 30149774
+ * @author AAL Farhan Ali, 30148704
+ */
 public class PrintReceiptController implements ReceiptPrinterObserver {
 	private ReceiptPrinter printer;
 	private ArrayList<BarcodedProduct> scannedItems;
 	private SelfCheckoutStation selfCheckoutStation;
 	private SelfCheckoutLogic selfCheckoutLogic;
 
+	/**
+	 * Basic Constructor
+	 * 
+	 * @param scs
+	 * 				The self-checkout station
+	 * @param scl
+	 * 				The self-checkout logic
+	 */
 	public PrintReceiptController(SelfCheckoutStation scs, SelfCheckoutLogic scl) {
 		scannedItems = scl.scannedItems;
 		selfCheckoutStation = scs;
 		selfCheckoutLogic = scl;
 		printer = scs.printer;
 		
+		//register ReceiptPrinter and listen for events
 		printer.register(this);
 	}
 	
+	/**
+	 * Method for building and returning the receipt
+	 * 1. Pulls the details of the transaction from scannedItems
+	 * 2. Prints to the receipt each item description and price
+	 * 3. Notifies the customer that their session is complete
+	 * 4. Thanks the customer and notifies that the station is ready for a new customer session
+	 * Receipt Format
+	 * "ITEMS:
+	 * item1: $X.XX
+	 * item2: $X.XX
+	 * ...
+	 * itemx: $X.XX
+	 * TOTAL: $X.XX"
+	 * @return String
+	 * 					returns a string that contains all the details of the payment
+	 * @throws OverloadException
+	 * 					when current line is too long (needs to be broken up by a \n)
+	 * @throws EmptyException
+	 * 					when there is either no more ink or paper in the station (or both)
+	 */
 	public String printReceipt() throws OverloadException, EmptyException {
 		//Only run if station is enabled
 		if (selfCheckoutLogic.systemDisabled) {
@@ -61,6 +87,7 @@ public class PrintReceiptController implements ReceiptPrinterObserver {
 			bdPrice = bdPrice.setScale(2, RoundingMode.HALF_UP);
 			String sPrice = bdPrice.toString();
 			
+			printer.print('$');
 			//Print item price to receipt
 			for (int i = 0; i < sPrice.length(); i++) {
 				printer.print(sPrice.charAt(i));
@@ -70,6 +97,7 @@ public class PrintReceiptController implements ReceiptPrinterObserver {
 		
 		//Print "TOTAL:" for total cost of items
 		printer.print('T'); printer.print('O'); printer.print('T'); printer.print('A'); printer.print('L'); printer.print(':'); printer.print(' ');
+		printer.print('$');
 		
 		//Get total cost of items and convert to string
 		BigDecimal bdTotalCost = selfCheckoutLogic.totalCost;

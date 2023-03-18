@@ -1,13 +1,3 @@
-//SENG300 Project
-//Group 47
-//Student Names:
-//Sumerah Rowshan (UCID: 30160897)
-//Justin Chu (UCID: 30162809)
-//Jitaksha Batish (UCID: 30116450)
-//Fairooz Shafin (UCID: 30149774)
-//AAL Farhan Ali (UCID: 30148704)
-
-
 package com.autovend;
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -20,6 +10,14 @@ import com.autovend.devices.observers.BillSlotObserver;
 import com.autovend.devices.observers.BillStorageObserver;
 import com.autovend.devices.observers.BillValidatorObserver;
 
+/**
+ * Controls the logic when customer is ready to pay
+ * @author Justin Chu, 30162809
+ * @author Jitaksha Batish, 30116450
+ * @author Sumerah Rowshan, 30160897
+ * @author Fairooz Shafin, 30149774
+ * @author AAL Farhan Ali, 30148704
+ */
 public class PayController implements BillSlotObserver, BillDispenserObserver, BillValidatorObserver, BillStorageObserver{
 	private SelfCheckoutStation selfCheckoutStation;
 	private SelfCheckoutLogic selfCheckoutLogic;
@@ -27,6 +25,14 @@ public class PayController implements BillSlotObserver, BillDispenserObserver, B
 	private BigDecimal amountDue;
 	private BigDecimal funds; 
 	
+	/**
+	 * Basic Constructor
+	 * 
+	 * @param scs
+	 * 				The self-checkout station
+	 * @param scl
+	 * 				The self-checkout logic
+	 */
 	public PayController(SelfCheckoutStation scs, SelfCheckoutLogic scl) {
 		selfCheckoutStation = scs;
 		selfCheckoutLogic = scl;
@@ -34,11 +40,13 @@ public class PayController implements BillSlotObserver, BillDispenserObserver, B
 		amountDue = scl.amountDue;
 		funds = scl.funds;
 		
+		//Register all bill related hardware and listen for events
 		scs.billInput.register(this);
 		scs.billValidator.register(this);
 		scs.billStorage.register(this);
 		scs.billOutput.register(this);
 		
+		//Register all dispenser instances
 		for(int i = 0; i < scs.billDenominations.length; i++) {
 			scs.billDispensers.get(scs.billDenominations[i]).register(this);
 		}
@@ -50,6 +58,14 @@ public class PayController implements BillSlotObserver, BillDispenserObserver, B
 		scs.billInput.enable();
 	}
 	
+	/**
+	 * Reaction for when a valid bill is inserted
+	 * 1. add inserted bill to funds
+	 * 2. update the amountDue (amountDue = totalCost - funds)
+	 * 3. if amountDue >= 0 notify the customer about the amountDue and wait for further bills
+	 * 4. if amountDue <= 0 notify the customer about the amountDue and dispense change (not yet implemented because of coins)
+	 * 5. the printing of the receipt would follow (not done here)
+	 */
 	@Override
 	public void reactToValidBillDetectedEvent(BillValidator validator, Currency currency, int value) {
 		//Only run if station is enabled
