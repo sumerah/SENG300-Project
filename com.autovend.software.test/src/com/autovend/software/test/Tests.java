@@ -21,9 +21,9 @@ import com.autovend.external.ProductDatabases;
 import com.autovend.products.BarcodedProduct;
 
 public class Tests {
-	private SelfCheckoutStation scs;
+	SelfCheckoutStation scs;
 	private Currency currency;
-	private SelfCheckoutLogic scl;
+	SelfCheckoutLogic scl;
 	private Barcode barcode1;
 	private Barcode barcode2;
 	
