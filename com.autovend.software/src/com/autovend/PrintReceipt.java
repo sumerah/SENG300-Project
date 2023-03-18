@@ -27,7 +27,7 @@ public class PrintReceipt implements ElectronicScaleObserver, ReceiptPrinterObse
 			value = bill.getValue();
 			String itemName = bill.getDesccription();
 		}
-		//BarcodedProduct item = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
+	
 	}
 	
 	
