@@ -12,13 +12,34 @@
 package com.autovend.software.test;
 
 import static org.junit.Assert.*;
-
+import org.junit.Before;
 import org.junit.Test;
+import com.autovend.PrintReceiptController;
+import com.autovend.SelfCheckoutLogic;
+import com.autovend.devices.OverloadException;
+import com.autovend.devices.SelfCheckoutStation;
+ 
 
-public class PrintReceiptTest {
+public class PrintReceiptTest extends Tests {
+	
+	private PrintReceiptController controller;
+	private SelfCheckoutStation selfCheckoutStation;
+	private SelfCheckoutLogic selfCheckoutLogic;
 
+	@Before
+	public void setup() throws OverloadException {
+		super.generalSetup();
+		
+		selfCheckoutStation = scs;
+		selfCheckoutLogic = scl
+		
+		
+		controller = new PrintReceiptController(scs, selfCheckoutLogic);
+	}
+	
+	
 	@Test
-	public void testPrintReceipt() {
+	public void test() {
 		
 	}
 
