@@ -3,6 +3,7 @@ package com.autovend.software.test;
 import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Currency;
 import java.util.Locale;
 
@@ -49,7 +50,7 @@ public class Tests {
 		BarcodedUnit item = new BarcodedUnit(barcode1, 100);
 		scs.mainScanner.scan(item);
 		System.out.println(scl.totalCost);
-		assertEquals(BigDecimal.valueOf(2.00), scl.totalCost);
+		assertEquals(BigDecimal.valueOf(2.00).setScale(2, RoundingMode.HALF_UP), scl.totalCost);
 	}
 	
 	@Test
