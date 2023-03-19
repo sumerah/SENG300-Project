@@ -72,9 +72,11 @@ public class PayController implements BillSlotObserver, BillDispenserObserver, B
 		if (selfCheckoutLogic.systemDisabled) {
 			throw new DisabledException();
 		}
-		
-		funds = funds.add(BigDecimal.valueOf(value));
+		BigDecimal v = new BigDecimal(value);
+		funds = funds.add(v);
+		System.out.println(funds);
 		amountDue = totalCost.subtract(funds);
+		System.out.println(amountDue);
 		if (amountDue.compareTo(new BigDecimal(0.00)) <= 0) {
 			//TODO Dispense Change function after coins are added to system 
 		} else {

@@ -16,16 +16,21 @@ import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.autovend.Barcode;
+import com.autovend.BarcodedUnit;
 import com.autovend.Bill;
+import com.autovend.Numeral;
 import com.autovend.devices.BillDispenser;
 import com.autovend.devices.BillSlot;
 import com.autovend.devices.BillStorage;
 import com.autovend.devices.BillValidator;
 import com.autovend.devices.DisabledException;
+import com.autovend.devices.OverloadException;
 import com.autovend.PayController;
 import com.autovend.SelfCheckoutLogic;
 import com.autovend.devices.SelfCheckoutStation;
@@ -33,6 +38,8 @@ import com.autovend.devices.observers.BillDispenserObserver;
 import com.autovend.devices.observers.BillSlotObserver;
 import com.autovend.devices.observers.BillStorageObserver;
 import com.autovend.devices.observers.BillValidatorObserver;
+import com.autovend.external.ProductDatabases;
+import com.autovend.products.BarcodedProduct;
 
 /**
  * This class contains JUnit tests for the PayController class, which is responsible for handling
@@ -43,6 +50,12 @@ public class PayWithCashTest {
     private SelfCheckoutStation scs;
     private SelfCheckoutLogic scl;
     private PayController payController;
+    private Currency c;
+    private BarcodedUnit apple;
+	private BarcodedUnit orange;
+	private BarcodedProduct appleProduct;
+	private BarcodedProduct orangeProduct;
+    
 
     /**
      * Sets up the test by creating a mock self-checkout station and self-checkout logic object, 
@@ -50,9 +63,18 @@ public class PayWithCashTest {
      */
     @Before
     public void setUp() {
-        scs = mock(SelfCheckoutStation.class);
-        scl = mock(SelfCheckoutLogic.class);
-        payController = new PayController(scs, scl);
+    	c = Currency.getInstance(Locale.CANADA);
+        scs = new SelfCheckoutStation(c, new int[] {5,10}, new BigDecimal[] {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10)}, 100, 1);
+        scl = new SelfCheckoutLogic(scs);
+        Barcode barcode1 = new Barcode(Numeral.valueOf((byte) 1));
+		Barcode barcode2 = new Barcode(Numeral.valueOf((byte) 2));
+		apple = new BarcodedUnit(barcode1, 100);
+		orange =new BarcodedUnit(barcode2, 150);
+		appleProduct = new BarcodedProduct(barcode1, "apple", BigDecimal.valueOf(10.00), 100);
+		orangeProduct = new BarcodedProduct(barcode2, "orange", BigDecimal.valueOf(1.50), 150);
+		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode1, appleProduct);
+		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode2, orangeProduct);
+		payController = new PayController(scs, scl);
     }
 
     /**
@@ -66,44 +88,39 @@ public class PayWithCashTest {
     /**
      * Tests the reactToValidBillDetectedEvent method of the PayController class when a valid bill
      * is detected.
+     * @throws OverloadException 
+     * @throws DisabledException 
      */
     @Test
-    public void testReactToValidBillDetectedEvent() {
-        Currency currency = Currency.getInstance("CAD");
-        BillValidator validator = mock(BillValidator.class);
+    public void testReactToValidBillDetectedEvent() throws DisabledException, OverloadException {
+        scl.selfCheckoutStation.mainScanner.scan(apple);
+        Bill bill = new Bill(5,c);
+        scl.selfCheckoutStation.billValidator.accept(bill);
+        
 
-        payController.reactToValidBillDetectedEvent(validator, currency, 20);
-
-        assertEquals(BigDecimal.valueOf(20), payController.funds);
-        verify(scl.customer).notifyAmountDue(payController.amountDue);
+        assertEquals(5, scl.customer.amountDue);
     }
-
+    
     /**
      * Tests the reactToValidBillDetectedEvent method of the PayController class when the system is 
      * disabled.
      */
     @Test(expected = DisabledException.class)
     public void testReactToValidBillDetectedEvent_whenSystemDisabled() {
-        payController.selfCheckoutLogic.systemDisabled = true;
-        Currency currency = Currency.getInstance("CAD");
-        BillValidator validator = mock(BillValidator.class);
-
-        payController.reactToValidBillDetectedEvent(validator, currency, 20);
+        scl.systemDisabled = true;
+        scl.selfCheckoutStation.billValidator.accept(new Bill(5, c));
+    }
+    
+    @Test(expected = DisabledException.class)
+    public void testwhenValidatordisabled() {
+    	scl.selfCheckoutStation.billValidator.disable();
+    	scl.selfCheckoutStation.billValidator.accept(new Bill(5, c));
     }
 
-    /**
-     * Tests the reactToValidBillDetectedEvent method of the PayController class when the amount due 
-     * is zero.
-     */
-    @Test
-    public void testReactToValidBillDetectedEvent_whenAmountDueZero() {
-        Currency currency = Currency.getInstance("CAD");
-        BillValidator validator = mock(BillValidator.class);
-
-        payController.amountDue = BigDecimal.ZERO;
-        payController.reactToValidBillDetectedEvent(validator, currency, 20);
-
-        assertEquals(BigDecimal.valueOf(20), payController.funds);
+    @Test(expected = NullPointerException.class)
+    public void testwhenNullBill() {
+    	scl.selfCheckoutStation.billValidator.accept(null);
     }
+    
     
 }
