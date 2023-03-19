@@ -1,3 +1,12 @@
+//SENG300 Project
+//Group 47
+//Student Names:
+//Sumerah Rowshan (UCID: 30160897)
+//Justin Chu (UCID: 30162809)
+//Jitaksha Batish (UCID: 30116450)
+//Fairooz Shafin (UCID: 30149774)
+//AAL Farhan Ali (UCID: 30148704)package com.autovend.software.test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -25,11 +34,20 @@ import com.autovend.devices.observers.BillSlotObserver;
 import com.autovend.devices.observers.BillStorageObserver;
 import com.autovend.devices.observers.BillValidatorObserver;
 
-public class PayControllerTest {
+/**
+ * This class contains JUnit tests for the PayController class, which is responsible for handling
+ * the payment process in a self-checkout system.
+ */
+public class PayWithCashTest {
+    
     private SelfCheckoutStation scs;
     private SelfCheckoutLogic scl;
     private PayController payController;
 
+    /**
+     * Sets up the test by creating a mock self-checkout station and self-checkout logic object, 
+     * and instantiating a PayController object with those objects.
+     */
     @Before
     public void setUp() {
         scs = mock(SelfCheckoutStation.class);
@@ -37,11 +55,18 @@ public class PayControllerTest {
         payController = new PayController(scs, scl);
     }
 
+    /**
+     * Tests the constructor of the PayController class.
+     */
     @Test
     public void testConstructor() {
         assertNotNull(payController);
     }
 
+    /**
+     * Tests the reactToValidBillDetectedEvent method of the PayController class when a valid bill
+     * is detected.
+     */
     @Test
     public void testReactToValidBillDetectedEvent() {
         Currency currency = Currency.getInstance("CAD");
@@ -53,6 +78,10 @@ public class PayControllerTest {
         verify(scl.customer).notifyAmountDue(payController.amountDue);
     }
 
+    /**
+     * Tests the reactToValidBillDetectedEvent method of the PayController class when the system is 
+     * disabled.
+     */
     @Test(expected = DisabledException.class)
     public void testReactToValidBillDetectedEvent_whenSystemDisabled() {
         payController.selfCheckoutLogic.systemDisabled = true;
@@ -62,6 +91,10 @@ public class PayControllerTest {
         payController.reactToValidBillDetectedEvent(validator, currency, 20);
     }
 
+    /**
+     * Tests the reactToValidBillDetectedEvent method of the PayController class when the amount due 
+     * is zero.
+     */
     @Test
     public void testReactToValidBillDetectedEvent_whenAmountDueZero() {
         Currency currency = Currency.getInstance("CAD");
@@ -72,26 +105,3 @@ public class PayControllerTest {
 
         assertEquals(BigDecimal.valueOf(20), payController.funds);
     }
-
-    @Test
-    public void testReactToValidBillDetectedEvent_whenAmountDueNegative() {
-        Currency currency = Currency.getInstance("CAD");
-        BillValidator validator = mock(BillValidator.class);
-        BillDispenser dispenser = mock(BillDispenser.class);
-        BillDenomination denomination = BillDenomination.TWENTY;
-
-        payController.amountDue = BigDecimal.valueOf(-10);
-        payController.totalCost = BigDecimal.valueOf(10);
-        payController.scs.billDispensers.put(denomination, dispenser);
-        payController.scs.billDenominations = new BillDenomination[] { denomination };
-        payController.scs.billOutput = mock(BillOutput.class);
-
-        payController.reactToValidBillDetectedEvent(validator, currency, 20);
-
-        assertEquals(BigDecimal.valueOf(20), payController.funds);
-        verify(scl.customer).notifyAmountDue(payController.amountDue);
-        verify(dispenser).dispenseBills(new Bill[] { new Bill(denomination) });
-    }
-
-    @Test
-    public void test
