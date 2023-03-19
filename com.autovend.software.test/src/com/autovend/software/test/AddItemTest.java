@@ -107,6 +107,29 @@ public void testAddingItemUpdatesTotalCost() throws EmptyException, OverloadExce
     assertEquals(price, scl.totalCost);
 }
 
+@Test
+public void testAddingMultipleItemsUpdatesExpectedWeightAndTotalCost() throws EmptyException, OverloadException {
+    BarcodedProduct product1 = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode1);
+    BarcodedProduct product2 = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode2);
+    double expectedWeight = product1.getExpectedWeight() + product2.getExpectedWeight();
+    BigDecimal price1 = product1.getPrice().setScale(2, RoundingMode.HALF_UP);
+    BigDecimal price2 = product2.getPrice().setScale(2, RoundingMode.HALF_UP);
+    BigDecimal expectedTotalCost = price1.add(price2);
+    scs.handheldScanner.scan(barcode1);
+    scs.handheldScanner.scan(barcode2);
+    assertEquals(expectedWeight, scl.baggingAreaExpectedWeight, 0.01);
+    assertEquals(expectedTotalCost, scl.totalCost);
+}
+
+@Test(expected = DisabledException.class)
+public void testAddingItemWhenSystemDisabledThrowsDisabledException() throws EmptyException, OverloadException {
+    BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode1);
+    double expectedWeight = product.getExpectedWeight();
+    scl.disableSystem();
+    scs.handheldScanner.scan(barcode1);
+    assertEquals(expectedWeight, scl.baggingAreaExpectedWeight, 0.01);
+}
+
 	
 }
 	
