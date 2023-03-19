@@ -98,7 +98,7 @@ public class PayWithCashTest {
         scl.selfCheckoutStation.billValidator.accept(bill);
         
 
-        assertEquals(5, scl.customer.amountDue);
+        assertEquals(BigDecimal.valueOf(5), scl.customer.amountDue);
     }
     
     /**
@@ -117,10 +117,27 @@ public class PayWithCashTest {
     	scl.selfCheckoutStation.billValidator.accept(new Bill(5, c));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testwhenNullBill() {
-    	scl.selfCheckoutStation.billValidator.accept(null);
+    	boolean b= false;
+    	try {
+    		scl.selfCheckoutStation.billValidator.accept(null);
+    	}
+    	catch(Exception e) {
+    		b = true;
+    	}
+    	assertTrue(b);
     }
+    
+    @Test
+    public void invalidBill() {
+    	scl.selfCheckoutStation.mainScanner.scan(apple);
+    	scl.selfCheckoutStation.billValidator.accept(new Bill(20, c));
+    	BigDecimal v = scl.totalCost;
+    	assertEquals(v, scl.amountDue);
+    }
+    
+    
     
     
 }

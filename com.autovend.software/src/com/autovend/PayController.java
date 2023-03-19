@@ -80,8 +80,13 @@ public class PayController implements BillSlotObserver, BillDispenserObserver, B
 		if (amountDue.compareTo(new BigDecimal(0.00)) <= 0) {
 			//TODO Dispense Change function after coins are added to system 
 		} else {
-			selfCheckoutLogic.customer.notifyAmountDue(amountDue);
+			selfCheckoutLogic.customer.amountDue = amountDue;
 		}
+	}
+	
+	@Override
+	public void reactToInvalidBillDetectedEvent(BillValidator validator) {
+		selfCheckoutLogic.customer.notifyAmountDue(totalCost);
 	}
 
 	@Override
@@ -139,11 +144,7 @@ public class PayController implements BillSlotObserver, BillDispenserObserver, B
 	}
 
 
-	@Override
-	public void reactToInvalidBillDetectedEvent(BillValidator validator) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 	@Override
 	public void reactToBillsFullEvent(BillDispenser dispenser) {
