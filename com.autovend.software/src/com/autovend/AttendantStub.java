@@ -9,15 +9,15 @@ package com.autovend;
  * @author AAL Farhan Ali, 30148704
  */
 public class AttendantStub {
-	public int duplicateReceipt = 0;
-	public int stationNeedsMaintenance = 0;
+	public boolean duplicateReceipt = false;
+	public boolean stationNeedsMaintenance = false;
 	
 	
 	public void notifyDuplicateReceipt() {
-		duplicateReceipt += 1;
+		duplicateReceipt =true;
 	}
 	
 	public void notifyStationNeedsMaintenance() {
-		stationNeedsMaintenance = 1;
+		stationNeedsMaintenance = true;
 	}
 }

@@ -111,9 +111,34 @@ public class PrintReceiptTest {
 		catch(Exception e) {
 			b=true;
 		}
+		
+		System.out.println(scl.attendant.duplicateReceipt);
 		assertTrue(b);
-		assertEquals(1, scl.attendant.stationNeedsMaintenance);
+		assertTrue(scl.attendant.stationNeedsMaintenance);
 		assertTrue(scl.isDisabled());
+		assertTrue(scl.attendant.duplicateReceipt);
+	}
+	
+	@Test
+	public void outofInk() throws OverloadException {
+		SelfCheckoutStation scs = new SelfCheckoutStation(c, new int[] {5,10}, new BigDecimal[] {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10)}, 100, 1);
+		scs.printer.addPaper(100);
+		scs.printer.addInk(2);
+		SelfCheckoutLogic scl = new SelfCheckoutLogic(scs);
+		scl.selfCheckoutStation.mainScanner.scan(apple);
+		scl.selfCheckoutStation.mainScanner.scan(orange);
+		String receipt = null;
+		boolean b = false;
+		try {
+			receipt = scl.printReceiptController.printReceipt();
+		}
+		catch(Exception e) {
+			b=true;
+		}
+		assertTrue(b);
+		assertTrue(scl.attendant.stationNeedsMaintenance);
+		assertTrue(scl.isDisabled());
+		assertTrue(scl.attendant.duplicateReceipt);
 	}
 
 }
