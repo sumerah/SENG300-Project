@@ -46,7 +46,7 @@ public class Tests {
 		scs = new SelfCheckoutStation(currency, new int[] {5,10}, new BigDecimal[] {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10)}, 100, 1);
 		scl = new SelfCheckoutLogic(scs);
 		Numeral number = Numeral.valueOf((byte) 1);
-		Numeral number2 = Numeral.valueOf((byte) 2);
+		Numeral number2 = Numeral.valueOf((byte) 1);
 		barcode1 = new Barcode(number);
 		barcode2 = new Barcode(number2);
 		bp1 = new BarcodedProduct(barcode1, "apple", BigDecimal.valueOf(2.00), 100);
