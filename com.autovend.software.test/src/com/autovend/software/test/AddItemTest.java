@@ -98,6 +98,14 @@ public void testAddingItemUpdatesExpectedWeight() throws EmptyException, Overloa
     assertEquals(expectedWeight, scl.baggingAreaExpectedWeight, 0.01);
 }
 
+@Test
+public void testAddingItemUpdatesTotalCost() throws EmptyException, OverloadException {
+    BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode1);
+    BigDecimal price = product.getPrice().setScale(2, RoundingMode.HALF_UP);
+    scs.handheldScanner.scan(barcode1);
+    assertEquals(price, scl.totalCost);
+}
+
 	
 }
 	
