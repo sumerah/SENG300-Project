@@ -45,13 +45,50 @@ public class AddItemTest {
 		scs.printer.addPaper(20);
 	}
 
-	@Test
-	public void test() {
+@Test
+public void test() {
 		BarcodedUnit item = new BarcodedUnit(barcode1, 100);
 		scs.mainScanner.scan(item);
 		System.out.println(scl.totalCost);
 		assertEquals(BigDecimal.valueOf(2.00).setScale(2, RoundingMode.HALF_UP), scl.totalCost);
   }
   
+@Test
+public void testAddMultipleItems() {
+    // scan two items
+    BarcodedUnit item1 = new BarcodedUnit(barcode1, 100);
+    BarcodedUnit item2 = new BarcodedUnit(barcode2, 150);
+    scs.mainScanner.scan(item1);
+    scs.mainScanner.scan(item2);
+    
+    // assert the total cost is correct
+    assertEquals(BigDecimal.valueOf(3.50).setScale(2, RoundingMode.HALF_UP), scl.totalCost);
+}
+
+@Test(expected = DisabledException.class)
+public void testStationDisabled() throws DisabledException {
+    // disable the station
+    selfCheckoutLogic.disable();
+    
+    // scan an item (should throw DisabledException)
+    BarcodedUnit item = new BarcodedUnit(barcode1, 100);
+    scs.mainScanner.scan(item);
+}
+	
+@Test(expected = EmptyException.class)
+public void testBaggingAreaEmpty() throws EmptyException {
+    // scan an item without placing it in the bagging area (should throw EmptyException)
+    BarcodedUnit item = new BarcodedUnit(barcode1, 100);
+    scs.mainScanner.scan(item);
+    selfCheckoutLogic.enable();
+}
+	
+@Test(expected = OverloadException.class)
+public void testStationOverloaded() throws OverloadException {
+    // scan an item that exceeds the maximum weight capacity of the bagging area (should throw OverloadException)
+    BarcodedUnit item = new BarcodedUnit(barcode1, 101);
+    scs.mainScanner.scan(item);
+}
+
 }
 	

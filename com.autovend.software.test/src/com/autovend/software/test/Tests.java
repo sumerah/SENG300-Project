@@ -32,7 +32,7 @@ import com.autovend.products.BarcodedProduct;
 
 public class Tests {
 	SelfCheckoutStation scs;
-	private Currency currency;
+	Currency currency;
 	SelfCheckoutLogic scl;
 	Barcode barcode1;
 	Barcode barcode2;
