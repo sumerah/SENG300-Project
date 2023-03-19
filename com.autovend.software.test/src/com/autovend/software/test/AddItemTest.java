@@ -75,6 +75,20 @@ public void testStationDisabled() throws DisabledException {
     scs.mainScanner.scan(item);
 }
 	
+@Test(expected = EmptyException.class)
+public void testBaggingAreaEmpty() throws EmptyException {
+    // scan an item without placing it in the bagging area (should throw EmptyException)
+    BarcodedUnit item = new BarcodedUnit(barcode1, 100);
+    scs.mainScanner.scan(item);
+    selfCheckoutLogic.enable();
+}
 	
+@Test(expected = OverloadException.class)
+public void testStationOverloaded() throws OverloadException {
+    // scan an item that exceeds the maximum weight capacity of the bagging area (should throw OverloadException)
+    BarcodedUnit item = new BarcodedUnit(barcode1, 101);
+    scs.mainScanner.scan(item);
+}
+
 }
 	
