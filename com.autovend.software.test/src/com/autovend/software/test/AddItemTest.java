@@ -37,7 +37,7 @@ public class AddItemTest {
 	private Barcode barcode1;
 	private Barcode barcode2;
 	
-	
+	// Before for the test, initializing stuff. 
 	@Before
 	public void generalSetup() throws OverloadException {
 		currency = Currency.getInstance(Locale.CANADA);
@@ -54,7 +54,8 @@ public class AddItemTest {
 		scs.printer.addInk(100);
 		scs.printer.addPaper(20);
 	}
-
+	
+// test for adding new item
 @Test
 public void test() {
 		BarcodedUnit item = new BarcodedUnit(barcode1, 100);
