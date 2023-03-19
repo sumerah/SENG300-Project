@@ -14,26 +14,34 @@ package com.autovend.software.test;
 import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.autovend.BarcodedUnit;
+import com.autovend.PayController;
 import com.autovend.PrintReceiptController;
 import com.autovend.SelfCheckoutLogic;
 import com.autovend.SellableUnit;
 import com.autovend.devices.OverloadException;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.products.BarcodedProduct;
+import com.autovend.Bill;
  
 
 public class PrintReceiptTest extends Tests {
 	private PrintReceiptController controller;
+	private PayController payController;
 	private SelfCheckoutStation selfCheckoutStation;
 	private SelfCheckoutLogic selfCheckoutLogic;
 	private BarcodedUnit apple;
 	private BarcodedUnit orange;
-	
+	private BarcodedProduct appleProduct;
+	private BarcodedProduct orangeProduct;
+	private Currency c;
+	private Bill bill;
 
 	@Before
 	public void setup() throws OverloadException {
@@ -42,18 +50,31 @@ public class PrintReceiptTest extends Tests {
 		selfCheckoutStation = scs;
 		selfCheckoutLogic = scl;
 		controller = new PrintReceiptController(selfCheckoutStation, selfCheckoutLogic);
-		
-		apple = new BarcodedUnit(barcode1, 2.0);
-		orange =new BarcodedUnit(barcode2, 1.5);
+		payController = new PayController(selfCheckoutStation, selfCheckoutLogic);
+		apple = new BarcodedUnit(barcode1, 100);
+		orange =new BarcodedUnit(barcode2, 150);
+		appleProduct = bp1;
+		orangeProduct = bp2;
+		c = Currency.getInstance(Locale.CANADA);
+		bill = new Bill(5, c);
 	}
 	
 	
 	@Test
 	public void printReceiptTest() {
 		
-		scs.handheldScanner.scan((SellableUnit)apple);
-		
-		
+		scl.selfCheckoutStation.mainScanner.scan(apple);
+		scl.selfCheckoutStation.mainScanner.scan(orange);
+		String receipt = null;
+		try {
+			receipt = scl.printReceiptController.printReceipt();
+		}
+		catch(Exception e) {
+			System.out.println("Failed to print receipt!");
+		}
+		String expected_receipt = "ITEMS:\napple: $2.00\norange: $1.50\nTOTAL: 3.50";
+		System.out.println(receipt);
+		assertEquals(expected_receipt, receipt);
 		
 	}
 
