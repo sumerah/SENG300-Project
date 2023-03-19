@@ -119,6 +119,11 @@ public class PrintReceiptTest {
 		assertTrue(scl.attendant.duplicateReceipt);
 	}
 	
+	
+	/**
+	 * Tests for when receipt printer is out of ink
+	 * @throws OverloadException
+	 */
 	@Test
 	public void outofInk() throws OverloadException {
 		SelfCheckoutStation scs = new SelfCheckoutStation(c, new int[] {5,10}, new BigDecimal[] {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10)}, 100, 1);
@@ -140,5 +145,6 @@ public class PrintReceiptTest {
 		assertTrue(scl.isDisabled());
 		assertTrue(scl.attendant.duplicateReceipt);
 	}
+	
 
 }

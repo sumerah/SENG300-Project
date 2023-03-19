@@ -152,7 +152,8 @@ public void testAddingItemWhenSystemDisabledThrowsDisabledException() throws Emp
 @Test(expected = IllegalArgumentException.class)
 public void testAddingItemWithInvalidBarcodeThrowsIllegalArgumentException() throws EmptyException, OverloadException {
     Barcode invalidBarcode = new Barcode(Numeral.valueOf((byte) 999));
-    scs.handheldScanner.scan(invalidBarcode);
+    BarcodedUnit barcodedUnit = new BarcodedUnit(invalidBarcode,0.5);
+    scs.handheldScanner.scan(barcodedUnit);
 }
 
 	
