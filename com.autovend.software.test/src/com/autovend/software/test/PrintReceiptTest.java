@@ -47,14 +47,14 @@ public class PrintReceiptTest extends Tests {
 	public void setup() throws OverloadException {
 		super.generalSetup();
 		
-		selfCheckoutStation = scs;
-		selfCheckoutLogic = scl;
+		selfCheckoutStation = new SelfCheckoutStation(currency, new int[] {5,10}, new BigDecimal[] {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10)}, 100, 1);
+		selfCheckoutLogic = new SelfCheckoutLogic(scs);
 		controller = new PrintReceiptController(selfCheckoutStation, selfCheckoutLogic);
 		payController = new PayController(selfCheckoutStation, selfCheckoutLogic);
 		apple = new BarcodedUnit(barcode1, 100);
 		orange =new BarcodedUnit(barcode2, 150);
-		appleProduct = bp1;
-		orangeProduct = bp2;
+		appleProduct = new BarcodedProduct(barcode1, "apple", BigDecimal.valueOf(2.00), 100);
+		orangeProduct = new BarcodedProduct(barcode2, "orange", BigDecimal.valueOf(1.50), 150);
 		c = Currency.getInstance(Locale.CANADA);
 		bill = new Bill(5, c);
 	}
@@ -62,7 +62,6 @@ public class PrintReceiptTest extends Tests {
 	
 	@Test
 	public void printReceiptTest() {
-		
 		scl.selfCheckoutStation.mainScanner.scan(apple);
 		scl.selfCheckoutStation.mainScanner.scan(orange);
 		String receipt = null;
@@ -72,9 +71,28 @@ public class PrintReceiptTest extends Tests {
 		catch(Exception e) {
 			System.out.println("Failed to print receipt!");
 		}
-		String expected_receipt = "ITEMS:\napple: $2.00\norange: $1.50\nTOTAL: 3.50";
+		String expected_receipt = "ITEMS:\napple: $2.00\norange: $1.50\nTOTAL: $3.50";
 		System.out.println(receipt);
 		assertEquals(expected_receipt, receipt);
+	}
+	
+	@Test
+	public void printReceiptTestsclDisabled() {
+		boolean b = false;
+		scl.selfCheckoutStation.mainScanner.scan(apple);
+		scl.disable();
+		String receipt = null;
+		try {
+			receipt = scl.printReceiptController.printReceipt();
+		}
+		catch(Exception e) {
+			b = true;
+		}
+		assertTrue(b);
+	}
+	
+	@Test
+	public void outofPaper() {
 		
 	}
 
