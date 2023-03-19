@@ -138,14 +138,13 @@ public void testAddingMultipleItemsUpdatesExpectedWeightAndTotalCost() throws Em
     assertEquals(expectedTotalCost, scl.totalCost);
 }
 
-//Test that trying to add an item when the system is disabled throws a DisabledException
+// Test that trying to add an item when the system is disabled throws a DisabledException
 @Test(expected = DisabledException.class)
 public void testAddingItemWhenSystemDisabledThrowsDisabledException() throws EmptyException, OverloadException {
     BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode1);
     double expectedWeight = product.getExpectedWeight();
     scl.disable();
-    scs.handheldScanner.scan(barcode1);
-    assertEquals(expectedWeight, scl.baggingAreaExpectedWeight, 0.01);
+    scs.addItemToBaggingArea(barcode1);
 }
 
 // Test that trying to add an item with an invalid barcode throws an IllegalArgumentException
