@@ -71,4 +71,10 @@ public class SelfCheckoutLogic {
 	 */
 	public void disable() {systemDisabled = true;}
 	
+	/**
+	 * returns true if disabled 
+	 */
+	public boolean isDisabled() {
+		return systemDisabled;
+	}
 }

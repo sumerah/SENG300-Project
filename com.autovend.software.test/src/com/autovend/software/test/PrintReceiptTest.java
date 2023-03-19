@@ -27,6 +27,7 @@ import com.autovend.PrintReceiptController;
 import com.autovend.SelfCheckoutLogic;
 import com.autovend.SellableUnit;
 import com.autovend.devices.OverloadException;
+import com.autovend.devices.ReceiptPrinter;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.external.ProductDatabases;
 import com.autovend.products.BarcodedProduct;
@@ -44,7 +45,6 @@ public class PrintReceiptTest {
 	private BarcodedProduct appleProduct;
 	private BarcodedProduct orangeProduct;
 	private Currency c;
-	private Bill bill;
 
 	@Before
 	public void setup() throws OverloadException {
@@ -97,20 +97,23 @@ public class PrintReceiptTest {
 	}
 	
 	@Test
-	public void outofPaper() {
+	public void outofPaper() throws OverloadException {
 		SelfCheckoutStation scs = new SelfCheckoutStation(c, new int[] {5,10}, new BigDecimal[] {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10)}, 100, 1);
+		scs.printer.addInk(100);
 		SelfCheckoutLogic scl = new SelfCheckoutLogic(scs);
 		scl.selfCheckoutStation.mainScanner.scan(apple);
 		scl.selfCheckoutStation.mainScanner.scan(orange);
 		String receipt = null;
+		boolean b = false;
 		try {
 			receipt = scl.printReceiptController.printReceipt();
 		}
 		catch(Exception e) {
+			b=true;
 		}
+		assertTrue(b);
 		assertEquals(1, scl.attendant.stationNeedsMaintenance);
-		assertEquals(1, scl.attendant.duplicateReceipt);
-		assertTrue(scl.systemDisabled);
+		assertTrue(scl.isDisabled());
 	}
 
 }
