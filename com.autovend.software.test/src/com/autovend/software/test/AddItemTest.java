@@ -132,8 +132,8 @@ public void testAddingMultipleItemsUpdatesExpectedWeightAndTotalCost() throws Em
     BigDecimal price1 = product1.getPrice().setScale(2, RoundingMode.HALF_UP);
     BigDecimal price2 = product2.getPrice().setScale(2, RoundingMode.HALF_UP);
     BigDecimal expectedTotalCost = price1.add(price2);
-    scs.handheldScanner.scan(barcode1);
-    scs.handheldScanner.scan(barcode2);
+    scs.handheldScanner.scan(new BarcodedUnit(barcode1, product1.getExpectedWeight()));
+    scs.handheldScanner.scan(new BarcodedUnit(barcode2, product2.getExpectedWeight()));
     assertEquals(expectedWeight, scl.baggingAreaExpectedWeight, 0.01);
     assertEquals(expectedTotalCost, scl.totalCost);
 }
