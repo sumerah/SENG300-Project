@@ -130,6 +130,12 @@ public void testAddingItemWhenSystemDisabledThrowsDisabledException() throws Emp
     assertEquals(expectedWeight, scl.baggingAreaExpectedWeight, 0.01);
 }
 
+@Test(expected = IllegalArgumentException.class)
+public void testAddingItemWithInvalidBarcodeThrowsIllegalArgumentException() throws EmptyException, OverloadException {
+    Barcode invalidBarcode = new Barcode(Numeral.valueOf((byte) 999));
+    scs.handheldScanner.scan(invalidBarcode);
+}
+
 	
 }
 	
