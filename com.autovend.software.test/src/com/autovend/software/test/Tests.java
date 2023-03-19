@@ -1,3 +1,13 @@
+//SENG300 Project
+//Group 47
+//Student Names:
+//Sumerah Rowshan (UCID: 30160897)
+//Justin Chu (UCID: 30162809)
+//Jitaksha Batish (UCID: 30116450)
+//Fairooz Shafin (UCID: 30149774)
+//AAL Farhan Ali (UCID: 30148704)
+
+
 package com.autovend.software.test;
 
 import static org.junit.Assert.*;
@@ -24,8 +34,10 @@ public class Tests {
 	SelfCheckoutStation scs;
 	private Currency currency;
 	SelfCheckoutLogic scl;
-	private Barcode barcode1;
-	private Barcode barcode2;
+	Barcode barcode1;
+	Barcode barcode2;
+	BarcodedProduct bp1;
+	BarcodedProduct bp2;
 	
 	
 	@Before
@@ -37,8 +49,8 @@ public class Tests {
 		Numeral number2 = Numeral.valueOf((byte) 2);
 		barcode1 = new Barcode(number);
 		barcode2 = new Barcode(number2);
-		BarcodedProduct bp1 = new BarcodedProduct(barcode1, "apple", BigDecimal.valueOf(2.00), 100);
-		BarcodedProduct bp2 = new BarcodedProduct(barcode2, "orange", BigDecimal.valueOf(1.50), 150);
+		bp1 = new BarcodedProduct(barcode1, "apple", BigDecimal.valueOf(2.00), 100);
+		bp2 = new BarcodedProduct(barcode2, "orange", BigDecimal.valueOf(1.50), 150);
 		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode1, bp1);
 		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode2, bp2);
 		scs.printer.addInk(100);
