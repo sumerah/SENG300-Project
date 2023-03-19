@@ -54,6 +54,7 @@ public void test() {
 		assertEquals(BigDecimal.valueOf(2.00).setScale(2, RoundingMode.HALF_UP), scl.totalCost);
   }
   
+// test for scanning multiple items
 @Test
 public void testAddMultipleItems() {
     // scan two items
@@ -66,6 +67,7 @@ public void testAddMultipleItems() {
     assertEquals(BigDecimal.valueOf(3.50).setScale(2, RoundingMode.HALF_UP), scl.totalCost);
 }
 
+// test for disabled station 
 @Test(expected = DisabledException.class)
 public void testStationDisabled() throws DisabledException {
     // disable the station
@@ -75,7 +77,8 @@ public void testStationDisabled() throws DisabledException {
     BarcodedUnit item = new BarcodedUnit(barcode1, 100);
     scs.mainScanner.scan(item);
 }
-	
+
+// test for empty bagging area
 @Test(expected = EmptyException.class)
 public void testBaggingAreaEmpty() throws EmptyException {
     // scan an item without placing it in the bagging area (should throw EmptyException)
@@ -84,6 +87,7 @@ public void testBaggingAreaEmpty() throws EmptyException {
     selfCheckoutLogic.enable();
 }
 	
+// test for station is overloaded
 @Test(expected = OverloadException.class)
 public void testStationOverloaded() throws OverloadException {
     // scan an item that exceeds the maximum weight capacity of the bagging area (should throw OverloadException)
@@ -91,6 +95,7 @@ public void testStationOverloaded() throws OverloadException {
     scs.mainScanner.scan(item);
 }
 
+// Test that adding an item updates the bagging area's expected weight correctly
 @Test
 public void testAddingItemUpdatesExpectedWeight() throws EmptyException, OverloadException {
     BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode1);
@@ -99,6 +104,7 @@ public void testAddingItemUpdatesExpectedWeight() throws EmptyException, Overloa
     assertEquals(expectedWeight, scl.baggingAreaExpectedWeight, 0.01);
 }
 
+// Test that adding an item updates the total cost correctly
 @Test
 public void testAddingItemUpdatesTotalCost() throws EmptyException, OverloadException {
     BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode1);
@@ -107,6 +113,7 @@ public void testAddingItemUpdatesTotalCost() throws EmptyException, OverloadExce
     assertEquals(price, scl.totalCost);
 }
 
+// Test that adding multiple items updates the bagging area's expected weight and total cost correctly
 @Test
 public void testAddingMultipleItemsUpdatesExpectedWeightAndTotalCost() throws EmptyException, OverloadException {
     BarcodedProduct product1 = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode1);
@@ -121,6 +128,7 @@ public void testAddingMultipleItemsUpdatesExpectedWeightAndTotalCost() throws Em
     assertEquals(expectedTotalCost, scl.totalCost);
 }
 
+//Test that trying to add an item when the system is disabled throws a DisabledException
 @Test(expected = DisabledException.class)
 public void testAddingItemWhenSystemDisabledThrowsDisabledException() throws EmptyException, OverloadException {
     BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode1);
@@ -130,6 +138,7 @@ public void testAddingItemWhenSystemDisabledThrowsDisabledException() throws Emp
     assertEquals(expectedWeight, scl.baggingAreaExpectedWeight, 0.01);
 }
 
+// Test that trying to add an item with an invalid barcode throws an IllegalArgumentException
 @Test(expected = IllegalArgumentException.class)
 public void testAddingItemWithInvalidBarcodeThrowsIllegalArgumentException() throws EmptyException, OverloadException {
     Barcode invalidBarcode = new Barcode(Numeral.valueOf((byte) 999));
