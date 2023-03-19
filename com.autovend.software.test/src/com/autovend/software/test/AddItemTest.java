@@ -90,5 +90,14 @@ public void testStationOverloaded() throws OverloadException {
     scs.mainScanner.scan(item);
 }
 
+@Test
+public void testAddingItemUpdatesExpectedWeight() throws EmptyException, OverloadException {
+    BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode1);
+    double expectedWeight = product.getExpectedWeight();
+    scs.handheldScanner.scan(barcode1);
+    assertEquals(expectedWeight, scl.baggingAreaExpectedWeight, 0.01);
+}
+
+	
 }
 	
