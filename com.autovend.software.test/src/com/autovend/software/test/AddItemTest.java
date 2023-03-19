@@ -81,7 +81,7 @@ public void testAddMultipleItems() {
 @Test(expected = DisabledException.class)
 public void testStationDisabled() throws DisabledException {
     // disable the station
-    selfCheckoutLogic.disable();
+    scl.disable();
     
     // scan an item (should throw DisabledException)
     BarcodedUnit item = new BarcodedUnit(barcode1, 100);
@@ -94,7 +94,7 @@ public void testBaggingAreaEmpty() throws EmptyException {
     // scan an item without placing it in the bagging area (should throw EmptyException)
     BarcodedUnit item = new BarcodedUnit(barcode1, 100);
     scs.mainScanner.scan(item);
-    selfCheckoutLogic.enable();
+    scl.enable();
 }
 	
 // test for station is overloaded
@@ -143,7 +143,7 @@ public void testAddingMultipleItemsUpdatesExpectedWeightAndTotalCost() throws Em
 public void testAddingItemWhenSystemDisabledThrowsDisabledException() throws EmptyException, OverloadException {
     BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode1);
     double expectedWeight = product.getExpectedWeight();
-    scl.disableSystem();
+    scl.disable();
     scs.handheldScanner.scan(barcode1);
     assertEquals(expectedWeight, scl.baggingAreaExpectedWeight, 0.01);
 }
