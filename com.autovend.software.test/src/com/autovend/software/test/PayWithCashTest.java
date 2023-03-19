@@ -96,9 +96,10 @@ public class PayWithCashTest {
     public void testReactToValidBillDetectedEvent() throws DisabledException, OverloadException {
         scl.selfCheckoutStation.mainScanner.scan(apple);
         Bill bill = new Bill(5,c);
+        scl.selfCheckoutStation.billInput.accept(bill);
         scl.selfCheckoutStation.billValidator.accept(bill);
         
-
+        assertTrue(scl.payController.billInserted);
         assertEquals(BigDecimal.valueOf(5), scl.customer.amountDue);
     }
     
@@ -117,12 +118,19 @@ public class PayWithCashTest {
     	scl.selfCheckoutStation.billValidator.disable();
     	scl.selfCheckoutStation.billValidator.accept(new Bill(5, c));
     }
+    
+    @Test(expected = DisabledException.class)
+    public void testwhenBillSlotDisabled() throws DisabledException, OverloadException {
+    	scl.selfCheckoutStation.billInput.disable();
+    	scl.selfCheckoutStation.billInput.accept(new Bill(5, c));
+    }
 
     @Test
     public void testwhenNullBill() {
     	boolean b= false;
     	try {
     		scl.selfCheckoutStation.billValidator.accept(null);
+    		scl.selfCheckoutStation.billInput.accept(null);
     	}
     	catch(Exception e) {
     		b = true;

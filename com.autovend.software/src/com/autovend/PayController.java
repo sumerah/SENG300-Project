@@ -100,11 +100,11 @@ public class PayController implements BillSlotObserver, BillDispenserObserver, B
 		// TODO Auto-generated method stub
 		
 	}
-
+	public boolean billInserted;
 	@Override
 	public void reactToBillInsertedEvent(BillSlot slot) {
-		// TODO Auto-generated method stub
 		
+		billInserted = true;
 	}
 
 	@Override
