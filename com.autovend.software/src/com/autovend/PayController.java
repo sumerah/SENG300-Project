@@ -1,97 +1,182 @@
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
+package com.autovend;
 import java.math.BigDecimal;
 import java.util.Currency;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import com.autovend.Bill;
-import com.autovend.BillDenomination;
-import com.autovend.BillDispenser;
-import com.autovend.BillInput;
-import com.autovend.BillOutput;
-import com.autovend.BillSlot;
-import com.autovend.BillStorage;
-import com.autovend.BillValidator;
-import com.autovend.DisabledException;
-import com.autovend.SelfCheckoutLogic;
-import com.autovend.SelfCheckoutStation;
+import com.autovend.*;
+import com.autovend.devices.*;
+import com.autovend.devices.observers.AbstractDeviceObserver;
 import com.autovend.devices.observers.BillDispenserObserver;
 import com.autovend.devices.observers.BillSlotObserver;
 import com.autovend.devices.observers.BillStorageObserver;
 import com.autovend.devices.observers.BillValidatorObserver;
 
-public class PayControllerTest {
-    private SelfCheckoutStation scs;
-    private SelfCheckoutLogic scl;
-    private PayController payController;
+/**
+ * Controls the logic when customer is ready to pay
+ * @author Justin Chu, 30162809
+ * @author Jitaksha Batish, 30116450
+ * @author Sumerah Rowshan, 30160897
+ * @author Fairooz Shafin, 30149774
+ * @author AAL Farhan Ali, 30148704
+ */
+public class PayController implements BillSlotObserver, BillDispenserObserver, BillValidatorObserver, BillStorageObserver{
+	private SelfCheckoutStation selfCheckoutStation;
+	private SelfCheckoutLogic selfCheckoutLogic;
+	private BigDecimal totalCost;
+	private BigDecimal amountDue;
+	private BigDecimal funds; 
+	
+	/**
+	 * Basic Constructor
+	 * 
+	 * @param scs
+	 * 				The self-checkout station
+	 * @param scl
+	 * 				The self-checkout logic
+	 */
+	public PayController(SelfCheckoutStation scs, SelfCheckoutLogic scl) {
+		selfCheckoutStation = scs;
+		selfCheckoutLogic = scl;
+		totalCost = scl.totalCost;
+		amountDue = scl.amountDue;
+		funds = scl.funds;
+		
+		//Register all bill related hardware and listen for events
+		scs.billInput.register(this);
+		scs.billValidator.register(this);
+		scs.billStorage.register(this);
+		scs.billOutput.register(this);
+		
+		//Register all dispenser instances
+		for(int i = 0; i < scs.billDenominations.length; i++) {
+			scs.billDispensers.get(scs.billDenominations[i]).register(this);
+		}
+		
+		//Notify the customer the amountDue
+		selfCheckoutLogic.customer.notifyAmountDue(amountDue);
+		
+		//System is ready for insertion of bills
+		scs.billInput.enable();
+	}
+	
+	/**
+	 * Reaction for when a valid bill is inserted
+	 * 1. add inserted bill to funds
+	 * 2. update the amountDue (amountDue = totalCost - funds)
+	 * 3. if amountDue >= 0 notify the customer about the amountDue and wait for further bills
+	 * 4. if amountDue <= 0 notify the customer about the amountDue and dispense change (not yet implemented because of coins)
+	 * 5. the printing of the receipt would follow (not done here)
+	 */
+	@Override
+	public void reactToValidBillDetectedEvent(BillValidator validator, Currency currency, int value) {
+		//Only run if station is enabled
+		if (selfCheckoutLogic.systemDisabled) {
+			throw new DisabledException();
+		}
+		
+		funds = funds.add(BigDecimal.valueOf(value));
+		amountDue = totalCost.subtract(funds);
+		if (amountDue.compareTo(new BigDecimal(0.00)) <= 0) {
+			//TODO Dispense Change function after coins are added to system 
+		} else {
+			selfCheckoutLogic.customer.notifyAmountDue(amountDue);
+		}
+	}
 
-    @Before
-    public void setUp() {
-        scs = mock(SelfCheckoutStation.class);
-        scl = mock(SelfCheckoutLogic.class);
-        payController = new PayController(scs, scl);
-    }
+	@Override
+	public void reactToEnabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    @Test
-    public void testConstructor() {
-        assertNotNull(payController);
-    }
+	@Override
+	public void reactToDisabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    @Test
-    public void testReactToValidBillDetectedEvent() {
-        Currency currency = Currency.getInstance("CAD");
-        BillValidator validator = mock(BillValidator.class);
+	@Override
+	public void reactToBillInsertedEvent(BillSlot slot) {
+		// TODO Auto-generated method stub
+		
+	}
 
-        payController.reactToValidBillDetectedEvent(validator, currency, 20);
+	@Override
+	public void reactToBillEjectedEvent(BillSlot slot) {
+		// TODO Auto-generated method stub
+		
+	}
 
-        assertEquals(BigDecimal.valueOf(20), payController.funds);
-        verify(scl.customer).notifyAmountDue(payController.amountDue);
-    }
+	@Override
+	public void reactToBillRemovedEvent(BillSlot slot) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    @Test(expected = DisabledException.class)
-    public void testReactToValidBillDetectedEvent_whenSystemDisabled() {
-        payController.selfCheckoutLogic.systemDisabled = true;
-        Currency currency = Currency.getInstance("CAD");
-        BillValidator validator = mock(BillValidator.class);
+	@Override
+	public void reactToBillsFullEvent(BillStorage unit) {
+		// TODO Auto-generated method stub
+		
+	}
 
-        payController.reactToValidBillDetectedEvent(validator, currency, 20);
-    }
+	@Override
+	public void reactToBillAddedEvent(BillStorage unit) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    @Test
-    public void testReactToValidBillDetectedEvent_whenAmountDueZero() {
-        Currency currency = Currency.getInstance("CAD");
-        BillValidator validator = mock(BillValidator.class);
+	@Override
+	public void reactToBillsLoadedEvent(BillStorage unit) {
+		// TODO Auto-generated method stub
+		
+	}
 
-        payController.amountDue = BigDecimal.ZERO;
-        payController.reactToValidBillDetectedEvent(validator, currency, 20);
+	@Override
+	public void reactToBillsUnloadedEvent(BillStorage unit) {
+		// TODO Auto-generated method stub
+		
+	}
 
-        assertEquals(BigDecimal.valueOf(20), payController.funds);
-    }
 
-    @Test
-    public void testReactToValidBillDetectedEvent_whenAmountDueNegative() {
-        Currency currency = Currency.getInstance("CAD");
-        BillValidator validator = mock(BillValidator.class);
-        BillDispenser dispenser = mock(BillDispenser.class);
-        BillDenomination denomination = BillDenomination.TWENTY;
+	@Override
+	public void reactToInvalidBillDetectedEvent(BillValidator validator) {
+		// TODO Auto-generated method stub
+		
+	}
 
-        payController.amountDue = BigDecimal.valueOf(-10);
-        payController.totalCost = BigDecimal.valueOf(10);
-        payController.scs.billDispensers.put(denomination, dispenser);
-        payController.scs.billDenominations = new BillDenomination[] { denomination };
-        payController.scs.billOutput = mock(BillOutput.class);
+	@Override
+	public void reactToBillsFullEvent(BillDispenser dispenser) {
+		// TODO Auto-generated method stub
+		
+	}
 
-        payController.reactToValidBillDetectedEvent(validator, currency, 20);
+	@Override
+	public void reactToBillsEmptyEvent(BillDispenser dispenser) {
+		// TODO Auto-generated method stub
+		
+	}
 
-        assertEquals(BigDecimal.valueOf(20), payController.funds);
-        verify(scl.customer).notifyAmountDue(payController.amountDue);
-        verify(dispenser).dispenseBills(new Bill[] { new Bill(denomination) });
-    }
+	@Override
+	public void reactToBillAddedEvent(BillDispenser dispenser, Bill bill) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    @Test
-    public void test
+	@Override
+	public void reactToBillRemovedEvent(BillDispenser dispenser, Bill bill) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void reactToBillsLoadedEvent(BillDispenser dispenser, Bill... bills) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void reactToBillsUnloadedEvent(BillDispenser dispenser, Bill... bills) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

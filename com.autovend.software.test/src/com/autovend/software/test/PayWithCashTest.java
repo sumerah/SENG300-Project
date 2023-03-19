@@ -5,7 +5,8 @@
 //Justin Chu (UCID: 30162809)
 //Jitaksha Batish (UCID: 30116450)
 //Fairooz Shafin (UCID: 30149774)
-//AAL Farhan Ali (UCID: 30148704)package com.autovend.software.test;
+//AAL Farhan Ali (UCID: 30148704)
+package com.autovend.software.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -105,3 +106,5 @@ public class PayWithCashTest {
 
         assertEquals(BigDecimal.valueOf(20), payController.funds);
     }
+    
+}
