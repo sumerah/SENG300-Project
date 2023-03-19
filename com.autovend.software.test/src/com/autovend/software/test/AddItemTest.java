@@ -142,9 +142,10 @@ public void testAddingMultipleItemsUpdatesExpectedWeightAndTotalCost() throws Em
 @Test(expected = DisabledException.class)
 public void testAddingItemWhenSystemDisabledThrowsDisabledException() throws EmptyException, OverloadException {
     BarcodedProduct product = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode1);
+    BarcodedUnit barcodedUnit = new BarcodedUnit(barcode1,0.5);
     double expectedWeight = product.getExpectedWeight();
     scl.disable();
-    scs.addItemToBaggingArea(barcode1);
+    scl.selfCheckoutStation.mainScanner.scan(barcodedUnit);
 }
 
 // Test that trying to add an item with an invalid barcode throws an IllegalArgumentException
