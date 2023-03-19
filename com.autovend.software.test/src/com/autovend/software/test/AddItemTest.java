@@ -75,6 +75,13 @@ public void testStationDisabled() throws DisabledException {
     scs.mainScanner.scan(item);
 }
 	
-	
+@Test(expected = EmptyException.class)
+public void testBaggingAreaEmpty() throws EmptyException {
+    // scan an item without placing it in the bagging area (should throw EmptyException)
+    BarcodedUnit item = new BarcodedUnit(barcode1, 100);
+    scs.mainScanner.scan(item);
+    selfCheckoutLogic.enable();
+}
+
 }
 	
