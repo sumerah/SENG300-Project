@@ -6,6 +6,7 @@
 //Jitaksha Batish (UCID: 30116450)
 //Fairooz Shafin (UCID: 30149774)
 //AAL Farhan Ali (UCID: 30148704)
+
 package com.autovend.software.test;
 
 import static org.junit.Assert.assertEquals;
@@ -20,16 +21,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.autovend.Bill;
-import com.autovend.BillDenomination;
-import com.autovend.BillDispenser;
-import com.autovend.BillInput;
-import com.autovend.BillOutput;
-import com.autovend.BillSlot;
-import com.autovend.BillStorage;
-import com.autovend.BillValidator;
-import com.autovend.DisabledException;
+import com.autovend.devices.BillDispenser;
+import com.autovend.devices.BillSlot;
+import com.autovend.devices.BillStorage;
+import com.autovend.devices.BillValidator;
+import com.autovend.devices.DisabledException;
+import com.autovend.PayController;
 import com.autovend.SelfCheckoutLogic;
-import com.autovend.SelfCheckoutStation;
+import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.devices.observers.BillDispenserObserver;
 import com.autovend.devices.observers.BillSlotObserver;
 import com.autovend.devices.observers.BillStorageObserver;

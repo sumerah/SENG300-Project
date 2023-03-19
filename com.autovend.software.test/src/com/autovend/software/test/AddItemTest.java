@@ -14,6 +14,7 @@ import com.autovend.Barcode;
 import com.autovend.BarcodedUnit;
 import com.autovend.Numeral;
 import com.autovend.SelfCheckoutLogic;
+import com.autovend.devices.DisabledException;
 import com.autovend.devices.EmptyException;
 import com.autovend.devices.OverloadException;
 import com.autovend.devices.SelfCheckoutStation;
